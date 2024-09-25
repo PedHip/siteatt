@@ -1,7 +1,7 @@
 <?php
 class Database {
     private $host = "localhost";
-    private $db_name = "sistema_cadastro";
+    private $db_name = "empresa";
     private $username = "root";
     private $password = "";
     public $conn;

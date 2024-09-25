@@ -20,7 +20,9 @@
 		<span id="emailError" style="color:red; display:none;">Este email já está em uso.</span><br><br>
 
 		<label for="telefone">Telefone:</label>
-		<input type="tel" id="telefone" name="telefone" required><br><br>
+		<input type="tel" id="telefone" name="telefone" required 
+       	maxlength="15" pattern="[0-9()+\- ]{1,15}" title="Apenas números e caracteres especiais (até 15 caracteres)"><br><br>
+
 
 		<label for="senha">Senha:</label>
 		<input type="password" id="senha" name="senha" required><br><br>

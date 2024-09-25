@@ -65,13 +65,6 @@ class Usuario {
 	}
 	
 
-	public function listarUsuarios() {
-        $query = "SELECT * FROM " . $this->table_name;
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
 	public function editarUsuario($idAtual, $idNovo, $tipo_usuario, $nome, $telefone, $email, $senha = null) {
 		// Verifica se o novo email já existe
 		if ($this->emailExistente($email, $idAtual)) {
@@ -105,10 +98,6 @@ class Usuario {
 	
 		return $stmt->execute();
 	}
-	
-	
-	
-	
 
     public function apagarUsuario($id) {
         $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
@@ -125,6 +114,47 @@ class Usuario {
 		$stmt->execute();
 	
 		return $stmt->fetchColumn() > 0; // Retorna true se o email já existir
+	}
+
+	public function listarUsuarios() {
+		$query = "SELECT * FROM " . $this->table_name;
+		$stmt = $this->conn->prepare($query);
+		$stmt->execute();
+		
+		// Certifique-se de que há resultados
+		if ($stmt->rowCount() > 0) {
+			return $stmt->fetchAll(PDO::FETCH_ASSOC);
+		} else {
+			return []; // Retorne um array vazio se não houver resultados
+		}
+	}
+
+	public function buscarUsuarios($term) {
+		// Prepara a consulta
+		$query = "SELECT * FROM " . $this->table_name . " WHERE 
+				  nome LIKE :term OR 
+				  email LIKE :term OR 
+				  telefone LIKE :term";
+	
+		// Adiciona a pesquisa por ID com LIKE
+		if (is_numeric($term)) {
+			$query .= " OR id LIKE :id";
+		}
+	
+		$stmt = $this->conn->prepare($query);
+		
+		// Prepara o termo de pesquisa
+		$likeTerm = "%" . $term . "%"; // Para busca parcial
+		$stmt->bindParam(':term', $likeTerm);
+	
+		// Para a pesquisa por ID
+		if (is_numeric($term)) {
+			$stmt->bindParam(':id', $likeTerm); // Usa o mesmo LIKE
+		}
+	
+		$stmt->execute();
+		
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
 	
 	
