@@ -23,6 +23,7 @@
 	</nav>
 
 	<main id="main">
+		<a id="bubble" href="bubble.php">Bubbles</a>
 		<a id="box_luxo" href="box_luxo.php" >Box De Luxo</a>
 		<a id="bubble_box" href="bubble_box.php" >Bubble na Box</a>
 		<a id="bubble_acrilico" href="bubble_acrilico.php" >Bubble Acrilico</a>

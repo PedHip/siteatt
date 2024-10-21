@@ -1,10 +1,12 @@
 <?php
 
 require_once 'db.php';
+require_once 'Produto.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $database = new Database();
     $db = $database->getConnection();
+    $produto = new Produto($db);
 
     // Coleta os dados do formulário
     $id_novo = $_POST['id_novo'];
@@ -31,40 +33,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     } else {
         // Se nenhuma nova imagem foi enviada, manter a imagem atual
-        $query = "SELECT img_prod FROM produtos WHERE id_prod = :id_atual";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':id_atual', $id_atual);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        $img_prod = $result['img_prod']; // Mantém a imagem atual
+        $img_prod = $produto->getImagemAtual($id_atual);
     }
 
     // Verifica se o novo ID já existe no banco de dados
     if ($id_novo !== $id_atual) {
-        $query = "SELECT COUNT(*) FROM produtos WHERE id_prod = :id_novo";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':id_novo', $id_novo);
-        $stmt->execute();
-        $count = $stmt->fetchColumn();
-
-        if ($count > 0) {
+        if ($produto->idExistente($id_novo)) {
             echo "Erro: O novo ID do produto já existe. Por favor, escolha um ID diferente.";
             exit;
         }
     }
 
     // Atualiza os dados do produto
-    $query = "UPDATE produtos SET id_prod = :id_novo, nome_prod = :nome_prod, desc_prod = :desc_prod, preco_prod = :preco_prod, img_prod = :img_prod, tipo_prod = :tipo_prod WHERE id_prod = :id_atual";
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':id_novo', $id_novo);
-    $stmt->bindParam(':nome_prod', $nome_prod);
-    $stmt->bindParam(':desc_prod', $desc_prod);
-    $stmt->bindParam(':preco_prod', $preco_prod);
-    $stmt->bindParam(':img_prod', $img_prod);
-    $stmt->bindParam(':tipo_prod', $tipo_prod);
-    $stmt->bindParam(':id_atual', $id_atual);
-
-    if ($stmt->execute()) {
+    if ($produto->atualizarProduto($id_novo, $nome_prod, $desc_prod, $preco_prod, $img_prod, $tipo_prod, $id_atual)) {
         echo "Produto atualizado com sucesso!";
     } else {
         echo "Erro ao atualizar produto.";
@@ -72,4 +53,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 } else {
     echo "Método não permitido.";
 }
+
 ?>

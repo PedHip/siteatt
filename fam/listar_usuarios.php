@@ -15,11 +15,20 @@ if (!isset($_SESSION['tipo_usuario']) || $_SESSION['tipo_usuario'] !== 'administ
     exit;
 }
 
-// Pega a página da requisição
-$pagina = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
-$usuarios = $usuario->listarUsuarios($pagina);
-$totalUsuarios = $usuario->contarUsuarios();
+// Recebe o termo de busca
+$term = isset($_GET['term']) ? $_GET['term'] : '';
 
-echo json_encode(['usuarios' => $usuarios, 'total' => $totalUsuarios]);
+// Verifica se uma página foi especificada para a listagem
+if (isset($_GET['pagina'])) {
+    // Pega a página da requisição
+    $pagina = intval($_GET['pagina']);
+    $usuarios = $usuario->listarUsuarios($pagina);
+    $totalUsuarios = $usuario->contarUsuarios();
 
+    echo json_encode(['usuarios' => $usuarios, 'total' => $totalUsuarios]);
+} else {
+    // Se não houver página, realiza a busca de usuários
+    $usuarios = $usuario->buscarUsuarios($term);
+    echo json_encode($usuarios);
+}
 ?>
